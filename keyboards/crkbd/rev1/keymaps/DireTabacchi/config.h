@@ -1,6 +1,8 @@
 /*
-Copyright 2019 @foostan
-Copyright 2020 Drashna Jaelre <@drashna>
+This is the c configuration file for the keymap
+
+Copyright 2012 Jun Wako <wakojun@gmail.com>
+Copyright 2015 Jack Humbert
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,21 +20,33 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
+//#define USE_MATRIX_I2C
+
+/* Select hand configuration */
+
 //#define TAPPING_TOGGLE 2
-//#define TAPPING_TERM 150
-//#define QUICK_TAP_TERM 150
+#define MASTER_LEFT
+// #define MASTER_RIGHT
+// #define EE_HANDS
 
-#ifdef RGBLIGHT_ENABLE
-#    define RGBLED_NUM 54 // Number of LEDs
-#    define RGBLED_SPLIT \
-        { 27, 27 }
-#    define RGBLIGHT_SPLIT
+// Mousekeys settings
+#define MK_3_SPEED
+#define MK_C_OFFSET_0 2
+#define MK_C_OFFSET_1 6
+#define MK_C_OFFSET_2 16
+
+// WPM settings
+#define WPM_SAMPLE_SECONDS 10
+#define WPM_SAMPLE_PERIODS 30
+//#define QUICK_TAP_TERM 200
+//#define TAPPING_TERM 200
+
+// N-key rollover
+#define FORCE_NKRO
+
+#define MINUTE_TO_MS 60000
+
+#ifdef OLED_ENABLE
+    #define OLED_TIMEOUT 10 * MINUTE_TO_MS
 #endif
 
-#ifdef RGB_MATRIX_ENABLE
-#    define RGBLED_NUM       54 // Number of LEDs
-#    define RGB_MATRIX_LED_COUNT RGBLED_NUM
-#    define RGB_MATRIX_SPLIT \
-        { 27, 27 }
-#    define SPLIT_TRANSPORT_MIRROR
-#endif
