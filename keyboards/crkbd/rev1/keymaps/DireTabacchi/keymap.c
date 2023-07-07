@@ -20,6 +20,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 static void render_logo(void);
 
+typedef enum {
+    TD_NONE,
+    TD_UNKNOWN,
+    TD_SINGLE_TAP,
+    TD_SINGLE_HOLD,
+    TD_DOUBLE_TAP
+} td_state_t;
+
+typedef struct {
+    bool is_press_action;
+    td_state_t state;
+} td_tap_t;
+
+// Tap-dance keycodes
+enum {
+    TD_THSL     // Tap dance: tap-hold symbol layer
+};
+
+td_state_t cur_dance(tap_dance_state_t *state);
+void thsl_finished(tap_dance_state_t *state, void *user_data);
+void thsl_reset(tap_dance_state_t *state, void *user_data);
+
 enum layer_names {
     _BL,    // Base Layer
     _SNL,   // Symbol-Number Layer
@@ -35,7 +57,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
       KC_LSFT,    KC_Z,    KC_X,    KC_C,    KC_D,    KC_V,                         KC_K,    KC_H, KC_COMM,  KC_DOT, KC_SLSH, KC_RSFT,
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                          KC_LGUI,MO(_SNL),  KC_SPC,    KC_BSPC, KC_LCTL, KC_RALT
+                                         KC_LGUI,TD(TD_THSL),KC_SPC,    KC_BSPC, KC_LCTL, KC_RALT
                                       //`--------------------------'  `--------------------------'
 
   ),
@@ -64,6 +86,57 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                       //`--------------------------'  `--------------------------'
   )
 };
+
+td_state_t cur_dance(tap_dance_state_t *state) {
+    if (state->count == 1 && state->pressed) {
+        return TD_SINGLE_HOLD;
+    } else if (state->count == 2) return TD_DOUBLE_TAP;
+    else return TD_UNKNOWN;
+}
+
+static td_tap_t thsl_tap_state = {
+    .is_press_action = true,
+    .state = TD_NONE
+};
+
+void thsl_finished(tap_dance_state_t *state, void *user_data) {
+    thsl_tap_state.state = cur_dance(state);
+    switch (thsl_tap_state.state) {
+        case TD_SINGLE_HOLD:
+            layer_on(_SNL);
+            break;
+        case TD_DOUBLE_TAP:
+            if (layer_state_is(_SNL)) {
+                layer_off(_SNL);
+            } else {
+                layer_on(_SNL);
+            }
+            break;
+        default:
+            break;
+    }
+}
+
+void thsl_reset(tap_dance_state_t *state, void *user_data) {
+    if (thsl_tap_state.state == TD_SINGLE_HOLD) {
+        layer_off(_SNL);
+    }
+    thsl_tap_state.state = TD_NONE;
+}
+
+// Associate tap dance keys with their funcionality.
+tap_dance_action_t tap_dance_actions[] = {
+    [TD_THSL] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, thsl_finished, thsl_reset)
+};
+
+uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        case QK_TAP_DANCE ... QK_TAP_DANCE_MAX:
+            return 225;
+        default:
+            return TAPPING_TERM;
+    }
+}
 
 #ifdef OLED_ENABLE
 

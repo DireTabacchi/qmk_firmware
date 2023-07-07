@@ -24,7 +24,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /* Select hand configuration */
 
-//#define TAPPING_TOGGLE 2
 #define MASTER_LEFT
 // #define MASTER_RIGHT
 // #define EE_HANDS
@@ -38,8 +37,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // WPM settings
 #define WPM_SAMPLE_SECONDS 10
 #define WPM_SAMPLE_PERIODS 30
-//#define QUICK_TAP_TERM 200
-//#define TAPPING_TERM 200
+
+// Tapping settings
+//#define TAPPING_TOGGLE 2
+//#define QUICK_TAP_TERM 0
+#define TAPPING_TERM 150
+#define TAPPING_TERM_PER_KEY
 
 // N-key rollover
 #define FORCE_NKRO
